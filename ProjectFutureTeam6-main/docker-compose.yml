@@ -1,0 +1,26 @@
+version: '3'
+services:
+  app:
+    container_name: java-container
+    restart: always
+    image: team6hub/team6repo:team6tag
+    #build: . # Will look at the current directory for the Dockerfile and build it
+    ports:
+      - '8080:8080' # map localhost 5001 to container's 8080.
+      # connection string to db would look like mysql://db:3306
+    depends_on:
+      - "db"
+    networks:
+      - team6-custom-network
+  db:
+    container_name: mysql-container
+    image: mysql:latest
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+    networks:
+      - team6-custom-network
+    ports:
+      - '5000:3306' # map localhost 5000 to container's 3306
+
+networks:
+    team6-custom-network:

@@ -1,0 +1,106 @@
+---
+
+- name:  Run Docker Compose 
+#  hosts: localhost
+  hosts: webservers
+  become: yes
+
+  tasks:
+
+    - name: Install Docker.
+      package:
+        name: docker.io
+        state: present
+
+    # - name: Install or update pip
+    #   community.general.easy_install:
+    #     name: pip
+    #     state: latest
+    
+    - name: Install pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install setuptools Python
+      apt:
+        name: python-pkg-resources
+        state: present
+
+    # - name: Install setuptools Python.
+    #   pip:
+    #     name: setuptools
+    #     state: present      
+ 
+    - name: Install docker-compose
+      get_url: 
+         url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+         dest: /usr/local/bin/docker-compose
+         mode: 'u+x,g+x'
+
+    #- name: Install docker-compose
+    #  pip:
+    #    name: docker-compose
+    #    state: present
+
+    - name: Set Interpreter
+      set_fact:
+        ansible_python_interpreter: '/usr/bin/python3'
+
+    - name: Install Docker SDK for Python.
+      pip:
+        name: docker==4.0.2
+        state: present
+
+
+    - name: Check current docker-compose version
+      command: docker-compose --version
+      register: docker_compose_vsn
+      changed_when: false
+      failed_when: false
+      check_mode: no
+
+    - name: Copy docker-compose-file
+      ansible.builtin.copy:
+        src: ./docker-compose.yml
+        dest: /home/pf-team-6
+        owner: pf-team-6
+        group: pf-team-6
+        mode: '0744'
+
+    # - name: Copy jar
+    #   ansible.builtin.copy:
+    #     src: /var/lib/jenkins/workspace/ProjectFutureTeam6_development/target/toDoAppWithLogin.jar
+    #     dest: /home/pf-team-6
+    #     owner: pf-team-6
+    #     group: pf-team-6
+    #     mode: '0744'
+
+    #- community.docker.docker_compose:
+    #    project_src: .
+    #    state: absent
+
+    # - name: Create and Start services
+    #   community.docker.docker_compose:
+    #     project_src: .
+    #     build: yes
+
+    # - name: Change directory to pf-team-6
+    #   ansible.builtin.command: cd /home/pf-team-6
+
+    - name: Run docker compose up
+      ansible.builtin.shell: docker-compose -f /home/pf-team-6/docker-compose.yml up -d
+
+    # - name: Check current docker-compose version
+    #   command: docker-compose --version
+    #   register: docker_compose_vsn
+    #   changed_when: false
+    #   failed_when: false
+    #   check_mode: no
+
+    # - set_fact:
+    #     docker_compose_current_version: "{{ docker_compose_vsn.stdout | regex_search('(\\d+(\\.\\d+)+)') }}"
+    #   when:
+    #     - docker_compose_vsn.stdout is defined
+
+

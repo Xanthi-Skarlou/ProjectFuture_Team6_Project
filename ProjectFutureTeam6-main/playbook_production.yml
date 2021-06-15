@@ -1,0 +1,56 @@
+---
+
+- name:  Production 
+  hosts: production
+  become: yes
+
+  tasks:
+
+    - name: Install Docker.
+      package:
+        name: docker.io
+        state: present
+
+    - name: Install pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install setuptools Python
+      apt:
+        name: python-pkg-resources
+        state: present
+
+    - name: Install docker-compose
+      get_url: 
+         url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+         dest: /usr/local/bin/docker-compose
+         mode: 'u+x,g+x'
+
+    - name: Set Interpreter
+      set_fact:
+        ansible_python_interpreter: '/usr/bin/python3'
+
+    - name: Install Docker SDK for Python.
+      pip:
+        name: docker==4.0.2
+        state: present
+
+
+    - name: Check current docker-compose version
+      command: docker-compose --version
+      register: docker_compose_vsn
+      changed_when: false
+      failed_when: false
+      check_mode: no
+
+    - name: Copy docker-compose-file
+      ansible.builtin.copy:
+        src: ./docker-compose.yml
+        dest: /home/pf-team-6
+        owner: pf-team-6
+        group: pf-team-6
+        mode: '0744'
+
+    - name: Run docker compose up
+      ansible.builtin.shell: docker-compose -f /home/pf-team-6/docker-compose.yml up -d
