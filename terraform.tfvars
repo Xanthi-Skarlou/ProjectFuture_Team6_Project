@@ -1,0 +1,5 @@
+location       = "norwayeast"
+subscription_id  = "4eac1cc4-0565-4b01-a32d-89ece52b4c73"
+client_appId        = "2e32c028-bd80-4909-ac7f-137e179706a8"
+client_password    = "1HGKQj_ecxVOChttgTt_iBCf2MENOkX_71"
+tenant_id        = "b1732512-60e5-48fb-92e8-8d6902ac1349"
